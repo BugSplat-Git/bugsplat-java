@@ -1,0 +1,11 @@
+P1 JAR deployment for our classes
+
+P2 Error log
+P2 ThreadGroup support
+P2 System look and feel for all dialogs
+P2 Server timeout, error handling
+P2 Better user response
+P2 Code clean up, exception handling, bullet-proof
+
+P3 Test cases for Throwable, Exception and Error
+P3 Verbose mode
