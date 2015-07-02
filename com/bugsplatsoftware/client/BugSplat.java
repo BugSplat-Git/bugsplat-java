@@ -626,14 +626,18 @@ public class BugSplat implements Runnable {
 
             String date = dateFormat1.format(new Date());
             String time = dateFormat2.format(new Date());
-            zipFileName = System.getProperty("java.io.tmpdir") + m_strDatabase + "Crash_" + date + "_" + time + ".zip";
+            String tmpDirName = System.getProperty("java.io.tmpdir");
+            if (!tmpDirName.endsWith(File.separator)) {
+              tmpDirName = tmpDirName + File.separator;
+            }
+            zipFileName = tmpDirName + m_strDatabase + "Crash_" + date + "_" + time + ".zip";
 
             byte[] buffer = new byte[18024];
 
             ZipOutputStream out = new ZipOutputStream(new FileOutputStream(zipFileName));
             m_strZipFile = zipFileName;
 
-			//
+			      //
             // stack file
             //
             System.out.println("Stackfile: " + m_strStackFile);

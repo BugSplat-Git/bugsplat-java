@@ -15,6 +15,17 @@ public class MyJavaCrasherConsole
     public static void main(String[] args)
     {
 		try {
+  		//String tmpDirName = System.getProperty("java.io.tmpdir");
+      //System.out.println("java.io.tmpdir = " + tmpDirName);
+      //if (tmpDirName.endsWith(File.separator)) {
+      //  System.out.println("java.io.tmpdir ends with File.separator");
+      //  tmpDirName = tmpDirName + File.separator;
+      //  System.out.println(tmpDirName);
+      //}
+      //else {
+      //  System.out.println("java.io.tmpdir does not end with File.separator");
+      //}
+
 			// init the bugsplat library with the required parameters
 			BugSplat.Init("Fred", "MyJavaCrasherConsole", "1.0");
 
