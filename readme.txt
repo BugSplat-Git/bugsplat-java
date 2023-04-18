@@ -1,4 +1,7 @@
-Setup files for BugSplat Java
+# bugsplat-java
+BugSplat integration for Java
+
+### Setup files for BugSplat Java
 -----------------------------
 
 Sun Java 2 Standard Edition (aka J2SE) SDK, version 1.4.2_09
