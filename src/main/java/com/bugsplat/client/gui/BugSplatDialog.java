@@ -5,7 +5,7 @@
 //
 // Copyright 2005 BugSplat, LLC.
 //
-package com.bugsplatsoftware.client.gui;
+package com.bugsplat.client.gui;
 
 import java.awt.TextArea;
 import java.awt.TextField;
@@ -21,7 +21,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.BorderFactory;
 
-import com.bugsplatsoftware.client.gui.BugSplatViewDetails;
+import com.bugsplat.client.gui.BugSplatViewDetails;
 
 public class BugSplatDialog extends JDialog implements ActionListener
 {

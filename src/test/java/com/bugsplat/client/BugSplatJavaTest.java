@@ -1,6 +1,6 @@
 
 import java.io.*;
-import com.bugsplatsoftware.client.util.BugSplatReport;
+import com.bugsplat.client.util.BugSplatReport;
 
 public class BugSplatJavaTest
 {

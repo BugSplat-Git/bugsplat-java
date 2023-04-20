@@ -4,7 +4,7 @@
 //
 // Copyright 2005 BugSplat, LLC.
 //
-package com.bugsplatsoftware.client.util;
+package com.bugsplat.client.util;
 
 public class BugSplatThread extends Thread
 {

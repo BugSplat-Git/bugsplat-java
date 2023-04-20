@@ -3,29 +3,29 @@
 :
 
 set classpath=.;C:\Program Files\Java\jdk1.7.0_51\lib
-set classpath=%classpath%;C:\www\src\BugSplat\BugSplatJava\lib\soap.jar
-set classpath=%classpath%;C:\www\src\BugSplat\BugSplatJava\lib\mailapi.jar
-set classpath=%classpath%;C:\www\src\BugSplat\BugSplatJava\lib\activation.jar
-set classpath=%classpath%;C:\www\src\BugSplat\BugSplatJava\lib\BrowserLauncher2-1_3.jar
+set classpath=%classpath%;C:\www\bugsplat-java\lib\soap.jar
+set classpath=%classpath%;C:\www\bugsplat-java\lib\mailapi.jar
+set classpath=%classpath%;C:\www\bugsplat-java\lib\activation.jar
+set classpath=%classpath%;C:\www\bugsplat-java\lib\BrowserLauncher2-1_3.jar
 
 :
 : Delete the old byte code and archives
 :
 
-del com\bugsplatsoftware\client\gui\BugSplatLabel.class
-del com\bugsplatsoftware\client\gui\BugSplatImageCanvas.class
-del com\bugsplatsoftware\client\gui\BugSplatViewDetails.class
-del com\bugsplatsoftware\client\gui\BugSplatDialog.class
-del com\bugsplatsoftware\client\gui\BugSplatProgress.class
-del com\bugsplatsoftware\client\gui\BugSplatDetails.class
+del src\main\java\com\bugsplat\client\gui\BugSplatLabel.class
+del src\main\java\com\bugsplat\client\gui\BugSplatImageCanvas.class
+del src\main\java\com\bugsplat\client\gui\BugSplatViewDetails.class
+del src\main\java\com\bugsplat\client\gui\BugSplatDialog.class
+del src\main\java\com\bugsplat\client\gui\BugSplatProgress.class
+del src\main\java\com\bugsplat\client\gui\BugSplatDetails.class
 
-del com\bugsplatsoftware\client\util\BugSplatFormPost.class
-del com\bugsplatsoftware\client\util\BugSplatTrustManager.class
-del com\bugsplatsoftware\client\util\BugSplatReport.class
-del com\bugsplatsoftware\client\util\BugSplatThreadGroup.class
-del com\bugsplatsoftware\client\util\BugSplatThread.class
+del src\main\java\com\bugsplat\client\util\BugSplatFormPost.class
+del src\main\java\com\bugsplat\client\util\BugSplatTrustManager.class
+del src\main\java\com\bugsplat\client\util\BugSplatReport.class
+del src\main\java\com\bugsplat\client\util\BugSplatThreadGroup.class
+del src\main\java\com\bugsplat\client\util\BugSplatThread.class
 
-del com\bugsplatsoftware\client\BugSplat.class
+del src\main\java\com\bugsplat\client\BugSplat.class
 
 del lib\bugsplat.jar
 
@@ -33,31 +33,22 @@ del lib\bugsplat.jar
 : Build the library classes
 :
 
-javac -deprecation com\bugsplatsoftware\client\gui\BugSplatLabel.java
-javac -deprecation com\bugsplatsoftware\client\gui\BugSplatImageCanvas.java
-javac -deprecation com\bugsplatsoftware\client\gui\BugSplatViewDetails.java
-javac -deprecation com\bugsplatsoftware\client\gui\BugSplatDialog.java
-javac -deprecation com\bugsplatsoftware\client\gui\BugSplatProgress.java
-javac -deprecation com\bugsplatsoftware\client\gui\BugSplatDetails.java
-
-javac -deprecation com\bugsplatsoftware\client\util\BugSplatFormPost.java
-javac -deprecation com\bugsplatsoftware\client\util\BugSplatTrustManager.java
-javac -deprecation com\bugsplatsoftware\client\util\BugSplatReport.java
-javac -deprecation com\bugsplatsoftware\client\util\BugSplatThreadGroup.java
-javac -deprecation com\bugsplatsoftware\client\util\BugSplatThread.java
-
-javac -deprecation com\bugsplatsoftware\client\BugSplat.java
+javac -deprecation -classpath src\main\java src\main\java\com\bugsplat\client\gui\*.java
+javac -deprecation -classpath src\main\java src\main\java\com\bugsplat\client\util\*.java
+javac -deprecation -classpath src\main\java src\main\java\com\bugsplat\client\BugSplat.java
 
 :
 : Archive the library
 :
-jar cvf bugsplat.jar com\bugsplatsoftware\client\*.class com\bugsplatsoftware\client\gui\*.class com\bugsplatsoftware\client\gui\images\*.gif com\bugsplatsoftware\client\util\*.class
+cd src\main\java
+jar cvf ..\..\..\bugsplat.jar com\bugsplat\client\*.class com\bugsplat\client\gui\*.class com\bugsplat\client\gui\images\*.gif com\bugsplat\client\util\*.class
+cd ..\..\..
 
 :
 : Sign the jar
 : This is causing problems at runtime - for now, do not sign
 :
-: jarsigner -keystore BugSplatKeys -storepass DeerRun BugSplat.jar BugSplat 
+: jarsigner -keystore BugSplatKeys -storepass ****** BugSplat.jar BugSplat 
 
 :
 : Display the jar contents
@@ -77,34 +68,32 @@ del *.class -y
 del *.jar -y
 
 : Generate documentation
-javadoc -d doc com\bugsplatsoftware\client\BugSplat.java
+javadoc -classpath src/main/java -d doc src\main\java\com\bugsplat\client\BugSplat.java
  
-
-
 :
 : Build the demo application class
 :
-javac -deprecation MyJavaCrasher.java
+javac -deprecation -classpath lib/bugsplat.jar MyJavaCrasher.java
 
 :
 : Archive the demo application
 : The security manager will not allow the app to access network resource
 :
-:jar cvfm BugSplatDemo.jar manifest.txt *.class resources\*.gif
+jar cvfm BugSplatDemo.jar MyJavaCrasher.mf *.class resources\*.gif
 
 :
 : Sign the jar
 : This is causing problems at runtime - for now, do not sign
 :
-:jarsigner -keystore BugSplatKeys -storepass DeerRun BugSplatDemo.jar BugSplat 
+: jarsigner -keystore BugSplatKeys -storepass ***** BugSplatDemo.jar BugSplat 
 
 :
 : Build the demo console class
 :
-javac -deprecation MyJavaCrasherConsole.java
+javac -deprecation -classpath target/bugsplat-java-0.0.4.jar MyJavaCrasherConsole.java
 
 :
 : Build the demo applet class
 : The security manager will not allow the applet to perform IO
 :
-:javac -deprecation MyJavaCrasherApplet.java
+javac -deprecation -classpath lib/bugsplat.jar MyJavaCrasherApplet.java

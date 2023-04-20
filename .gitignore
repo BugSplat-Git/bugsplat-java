@@ -24,3 +24,9 @@ hs_err_pid*
 
 # Javadoc
 doc
+
+# Jar Signing
+BugSplatKeys
+
+# Build
+target

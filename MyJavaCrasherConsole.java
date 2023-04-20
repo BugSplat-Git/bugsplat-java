@@ -8,7 +8,7 @@
 
 import java.io.*;
 
-import com.bugsplatsoftware.client.BugSplat;
+import com.bugsplat.client.BugSplat;
 
 public class MyJavaCrasherConsole
 {

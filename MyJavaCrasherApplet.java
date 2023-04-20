@@ -1,7 +1,7 @@
 import java.applet.*;
 import java.awt.*;
 
-import com.bugsplatsoftware.client.BugSplat;
+import com.bugsplat.client.BugSplat;
 
 public class MyJavaCrasherApplet extends Applet {
 

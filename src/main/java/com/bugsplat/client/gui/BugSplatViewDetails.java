@@ -5,7 +5,7 @@
 //
 // Copyright 2005 BugSplat, LLC.
 //
-package com.bugsplatsoftware.client.gui;
+package com.bugsplat.client.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -31,7 +31,7 @@ public class BugSplatViewDetails extends JDialog implements ActionListener
 	boolean m_enableAdditionalFiles = true;
 
 	String ServerError = "None.";
-	String ServerURL = "http://www.bugsplatsoftware.com/post/post_form.php";
+	String ServerURL = "http://www.bugsplat.com/post/post_form.php";
 
 	JTable table1;
 	JButton ok, cancel;

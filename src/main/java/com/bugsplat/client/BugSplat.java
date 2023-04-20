@@ -1,11 +1,11 @@
 //
 // BugSplat integration code for Java applications.
 // This class allows a Java application to post
-// BugSplat reports on www.BugSplatSoftware.com
+// BugSplat reports on www.bugsplat.com
 //
 // Copyright 2014 BugSplat, LLC.
 //
-package com.bugsplatsoftware.client;
+package com.bugsplat.client;
 
 import java.io.*;
 import java.util.*;
@@ -14,12 +14,12 @@ import java.text.*;
 import javax.swing.*;	// debug with JOptionPane.showMessageDialog
 import java.net.*;
 
-import com.bugsplatsoftware.client.gui.BugSplatDialog;
-import com.bugsplatsoftware.client.gui.BugSplatProgress;
-import com.bugsplatsoftware.client.gui.BugSplatDetails;
-import com.bugsplatsoftware.client.util.BugSplatReport;
-import com.bugsplatsoftware.client.util.BugSplatThread;
-import com.bugsplatsoftware.client.util.BugSplatThreadGroup;
+import com.bugsplat.client.gui.BugSplatDialog;
+import com.bugsplat.client.gui.BugSplatProgress;
+import com.bugsplat.client.gui.BugSplatDetails;
+import com.bugsplat.client.util.BugSplatReport;
+import com.bugsplat.client.util.BugSplatThread;
+import com.bugsplat.client.util.BugSplatThreadGroup;
 
 /**
  * BugSplat support for Java applications.
@@ -71,9 +71,9 @@ public class BugSplat implements Runnable {
      * organizational purposes when navigating the web site interactively.
      */
     public static void Init(
-            String szDatabase, /* database on bugsplatsoftware.com*/
-            String szAppName, /* application name as on file at bugsplatsoftware.com */
-            String szVersion) /* version identifier, as supplied with PDB files on bugsplatsoftware.com*/ {
+            String szDatabase, /* database on bugsplat.com*/
+            String szAppName, /* application name as on file at bugsplat.com */
+            String szVersion) /* version identifier, as supplied with PDB files on bugsplat.com*/ {
         m_strDatabase = szDatabase;
         m_strAppName = szAppName;
         m_strVersion = szVersion;

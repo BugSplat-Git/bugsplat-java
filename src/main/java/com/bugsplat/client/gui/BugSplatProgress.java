@@ -4,7 +4,7 @@
 //
 // Copyright 2005 BugSplat, LLC.
 //
-package com.bugsplatsoftware.client.gui;
+package com.bugsplat.client.gui;
 
 import java.awt.BorderLayout;
 import java.awt.GridLayout;

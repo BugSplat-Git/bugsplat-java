@@ -5,7 +5,7 @@
 //
 // Copyright 2005 BugSplat, LLC.
 //
-package com.bugsplatsoftware.client.gui;
+package com.bugsplat.client.gui;
 
 import java.awt.TextArea;
 import java.awt.BorderLayout;
@@ -26,7 +26,7 @@ public class BugSplatDetails extends JDialog implements ActionListener
 	boolean Result = false;
 
 	String ServerError = "None.";
-	String ServerURL = "http://www.bugsplatsoftware.com/post/post_form.php";
+	String ServerURL = "http://www.bugsplat.com/post/post_form.php";
 
 	TextArea input1;
 
