@@ -4,7 +4,7 @@
 //
 // Copyright 2005 BugSplat, LLC.
 //
-package com.bugsplat.client.util;
+package com.bugsplat.util;
 
 import javax.net.ssl.X509TrustManager;
 

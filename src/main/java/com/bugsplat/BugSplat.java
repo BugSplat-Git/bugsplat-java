@@ -5,7 +5,7 @@
 //
 // Copyright 2014 BugSplat, LLC.
 //
-package com.bugsplat.client;
+package com.bugsplat;
 
 import java.io.*;
 import java.util.*;
@@ -14,12 +14,12 @@ import java.text.*;
 import javax.swing.*;	// debug with JOptionPane.showMessageDialog
 import java.net.*;
 
-import com.bugsplat.client.gui.BugSplatDialog;
-import com.bugsplat.client.gui.BugSplatProgress;
-import com.bugsplat.client.gui.BugSplatDetails;
-import com.bugsplat.client.util.BugSplatReport;
-import com.bugsplat.client.util.BugSplatThread;
-import com.bugsplat.client.util.BugSplatThreadGroup;
+import com.bugsplat.gui.BugSplatDialog;
+import com.bugsplat.gui.BugSplatProgress;
+import com.bugsplat.gui.BugSplatDetails;
+import com.bugsplat.util.BugSplatReport;
+import com.bugsplat.util.BugSplatThread;
+import com.bugsplat.util.BugSplatThreadGroup;
 
 /**
  * BugSplat support for Java applications.

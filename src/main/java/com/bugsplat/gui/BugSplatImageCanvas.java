@@ -4,7 +4,7 @@
 //
 // Copyright 2005 BugSplat, LLC.
 //
-package com.bugsplat.client.gui;
+package com.bugsplat.gui;
 
 import java.awt.Canvas;
 import java.awt.Image;

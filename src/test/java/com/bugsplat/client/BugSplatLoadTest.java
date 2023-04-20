@@ -1,6 +1,6 @@
 import java.util.Date;
 
-import com.bugsplat.client.BugSplat;
+import com.bugsplat.BugSplat;
 
 /*
  * Created on Nov 10, 2006

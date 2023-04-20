@@ -11,7 +11,7 @@ import java.awt.event.*;
 import java.io.*;
 import javax.swing.*;
 
-import com.bugsplat.client.BugSplat;
+import com.bugsplat.BugSplat;
 
 public class MyJavaCrasher implements ActionListener {
 
