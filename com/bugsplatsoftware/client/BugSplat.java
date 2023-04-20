@@ -313,69 +313,32 @@ public class BugSplat implements Runnable {
 
             if (progress.Cancelled == true) {
                 return;
-            } else {
-                progress.setTaskComplete(BugSplatProgress.taskCompilingReport);
             }
+            
+            progress.setTaskComplete(BugSplatProgress.taskCompilingReport);
+
+            // TODO BG remove
+            if (progress.Cancelled == true) {
+                return;
+            }
+
+            progress.setTaskComplete(BugSplatProgress.taskContactingServer);
 
             // TODO: need to be able to cancel this
-            boolean validated = BugSplatReport.AbleToSend(m_strDatabase, m_strAppName, m_strVersion);
-            if (validated) {
-                System.out.println("Able to send!");
+            BugSplatReport.PostDumpFile(m_strZipFile, m_strDatabase, m_strAppName, m_strVersion, "Java stack trace");
 
-                boolean accepted = BugSplatReport.AcceptReport(m_strMFA, m_strDatabase, m_strAppName, m_strVersion, m_strDescription);
-                if (accepted) {
-                    System.out.println("Accepted!");
-
-                    if (progress.Cancelled == true) {
-                        return;
-                    } else {
-                        progress.setTaskComplete(BugSplatProgress.taskContactingServer);
-                    }
-
-                    // TODO: need to be able to cancel this
-                    BugSplatReport.PostDumpFile(m_strZipFile, m_strDatabase, m_strAppName, m_strVersion, "Java stack trace");
-
-                    if (progress.Cancelled == true) {
-                        return;
-                    } else {
-                        // report posted
-                        progress.setTaskComplete(BugSplatProgress.taskSendingReport);
-
-                        if (progress.QuietMode == false) {
-                            BugSplatReport.HandlePostResponse();
-                        }
-
-                        progress.setVisible(false);
-                    }
-                } else {
-                    // report not accepted
-                    System.out.println("Report rejected!");
-
-                    if (progress.Cancelled == true) {
-                        return;
-                    } else {
-                        progress.setTaskComplete(BugSplatProgress.taskContactingServer);
-                    }
-
-                    // TODO: need to be able to cancel this
-                    BugSplatReport.PretendPostDumpFile(m_strMFA, m_strDatabase, m_strAppName, m_strVersion, m_strDescription);
-
-                    if (progress.Cancelled == true) {
-                        return;
-                    } else {
-                        // report posted
-                        progress.setTaskComplete(BugSplatProgress.taskSendingReport);
-
-                        if (progress.QuietMode == false) {
-                            BugSplatReport.HandlePretendPostResponse();
-                        }
-
-                        progress.setVisible(false);
-                    }
-                }
-            } else {
-                System.out.println("Unable to send!");
+            if (progress.Cancelled == true) {
+                return;
             }
+            
+            // report posted
+            progress.setTaskComplete(BugSplatProgress.taskSendingReport);
+
+            if (progress.QuietMode == false) {
+                BugSplatReport.HandlePostResponse();
+            }
+
+            progress.setVisible(false);
         } catch (Exception e2) {
             System.out.println("Exception in SendData: " + e2.toString());
         }
