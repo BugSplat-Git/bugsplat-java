@@ -12,7 +12,12 @@ import java.util.*;
 import java.util.zip.*;
 import java.text.*;
 import javax.swing.*;	// debug with JOptionPane.showMessageDialog
+
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+
 import java.net.*;
+import java.net.http.HttpClient;
 
 import com.bugsplat.gui.BugSplatDialog;
 import com.bugsplat.gui.BugSplatProgress;
@@ -72,8 +77,8 @@ public class BugSplat implements Runnable {
      */
     public static void Init(
             String szDatabase, /* database on bugsplat.com*/
-            String szAppName, /* application name as on file at bugsplat.com */
-            String szVersion) /* version identifier, as supplied with PDB files on bugsplat.com*/ {
+            String szAppName, /* application name */
+            String szVersion) /* version identifier */ {
         m_strDatabase = szDatabase;
         m_strAppName = szAppName;
         m_strVersion = szVersion;
@@ -159,7 +164,7 @@ public class BugSplat implements Runnable {
 
     /**
      * Provide a description of the crash that may be used to interactively
-     * sort/filter crashes on the BugSplat web site.
+     * sort/filter crashes on the BugSplat website.
      */
     public static void SetDescription(String description) {
         m_strDescription = description;
@@ -167,7 +172,7 @@ public class BugSplat implements Runnable {
 
     /**
      * Specify the path to an additional file to be included in the crash report
-     * package sent to the BugSplat web site.
+     * package sent to the BugSplat website.
      */
     public static void AddAdditionalFile(String additionalFile) {
         m_additionalFiles.add(additionalFile);
@@ -175,7 +180,7 @@ public class BugSplat implements Runnable {
 
     /**
      * Set quiet mode. By default, a progress dialog is displayed as the crash
-     * report is sent to the BugSplat web site. Calling this method with a true
+     * report is sent to the BugSplat website. Calling this method with a true
      * argument inhibits the progress dialog.
      */
     public static void SetQuietMode(boolean quiet) {
@@ -206,7 +211,7 @@ public class BugSplat implements Runnable {
 
     /**
      * Handle a caught exception with BugSplat. The crash report package will be
-     * sent to the BugSplat web site.
+     * sent to the BugSplat website.
      */
     public static void HandleException(Exception ex) {
         // save the exception
@@ -224,16 +229,18 @@ public class BugSplat implements Runnable {
     public void run() {
         System.out.println("Entering thread method...");
 
-        // check if there is an exception to proceszs
+        // check if there is an exception to process
         if (m_ex == null) {
             System.out.println("No exception...");
             return;
         }
 
         try {
+            // TODO BG only show if m_quietMode true?
             // show the main crash dialog
             boolean Result = BugSplat.ShowDialog();
 
+            // TODO BG only show if m_quietMode true?
             // check if user cancelled
             if (Result == true) {
                 // create the progress dialog
@@ -325,7 +332,9 @@ public class BugSplat implements Runnable {
             progress.setTaskComplete(BugSplatProgress.taskContactingServer);
 
             // TODO: need to be able to cancel this
-            BugSplatReport.PostDumpFile(m_strZipFile, m_strDatabase, m_strAppName, m_strVersion, "Java stack trace");
+            CloseableHttpClient client = HttpClients.createDefault();
+            BugSplatReport report = new BugSplatReport(m_strDatabase, m_strAppName, m_strVersion, client);
+            report.PostDumpFile(new File(m_strZipFile), "Java stack trace");
 
             if (progress.Cancelled == true) {
                 return;
