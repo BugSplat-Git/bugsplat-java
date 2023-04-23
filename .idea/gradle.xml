@@ -23,6 +23,7 @@
             <option value="$PROJECT_DIR$/bugsplat" />
             <option value="$PROJECT_DIR$/buildSrc" />
             <option value="$PROJECT_DIR$/my-java-crasher" />
+            <option value="$PROJECT_DIR$/my-java-crasher-applet" />
             <option value="$PROJECT_DIR$/my-java-crasher-console" />
           </set>
         </option>
