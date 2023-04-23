@@ -7,24 +7,23 @@
 //
 package com.bugsplat;
 
+import java.awt.*;
 import java.io.*;
 import java.util.*;
 import java.util.zip.*;
 import java.text.*;
-import javax.swing.*;	// debug with JOptionPane.showMessageDialog
 
+import com.bugsplat.api.BugSplatPostOptions;
+import com.bugsplat.api.BugSplatPostResult;
+import com.bugsplat.util.*;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 
 import java.net.*;
-import java.net.http.HttpClient;
 
 import com.bugsplat.gui.BugSplatDialog;
 import com.bugsplat.gui.BugSplatProgress;
 import com.bugsplat.gui.BugSplatDetails;
-import com.bugsplat.util.BugSplatReport;
-import com.bugsplat.util.BugSplatThread;
-import com.bugsplat.util.BugSplatThreadGroup;
 
 /**
  * BugSplat support for Java applications.
@@ -40,18 +39,17 @@ public class BugSplat implements Runnable {
     private static String m_strVersion = "";
 
     // additional info - optional
-    private static String m_strStackTrace = "";
-    private static String m_strDescription = "";
+    private static String m_strKey = "";
+    private static String m_strNotes = "";
     private static String m_strMFA = "";
-    private static String m_strStackKey = "";
     private static ArrayList m_additionalFiles = new ArrayList();
 
     // dialog data
     private static String m_strUserName = "";
     private static String m_strUserEmail = "";
-    private static String m_strUserAddress = "";
     private static String m_strUserDescription = "";
     private static boolean m_bEnableAdditionalFiles = true;
+
 
     // IP address of local host
     private static String m_strIPAddress = "";
@@ -63,9 +61,6 @@ public class BugSplat implements Runnable {
     private static String m_strStackFile = "";
     private static ArrayList m_requiredFiles = new ArrayList();
     private static String m_strZipFile = "";
-
-    private static String m_strError = "";
-    private static boolean m_reportCreated = false;
     private static boolean m_terminateApplication = false;
 
     private static Exception m_ex = null;
@@ -76,26 +71,14 @@ public class BugSplat implements Runnable {
      * organizational purposes when navigating the web site interactively.
      */
     public static void Init(
-            String szDatabase, /* database on bugsplat.com*/
+            String szDatabase, /* database on bugsplat.com */
             String szAppName, /* application name */
-            String szVersion) /* version identifier */ {
+            String szVersion /* version identifier */
+    ) {
         m_strDatabase = szDatabase;
         m_strAppName = szAppName;
         m_strVersion = szVersion;
 
-    }
-
-    // currently, we handle the stack trace and MFA internally only
-    private static void SetStackTrace(String stackTrace) {
-        m_strStackTrace = stackTrace;
-    }
-
-    private static void SetMFA(String MFA) {
-        m_strMFA = MFA;
-    }
-
-    private static void SetStackKey(String stackKey) {
-        m_strStackKey = stackKey;
     }
 
     private static void GetIPAddressForLocalHost() {
@@ -106,7 +89,7 @@ public class BugSplat implements Runnable {
             // get the raw ip only
             byte[] raw = inet.getAddress();
 
-			// java doesn't support unsigned types,
+            // java doesn't support unsigned types,
             // so we have to use some trickery
             int raw0 = 0xFF & (int) raw[0];
             int raw1 = 0xFF & (int) raw[1];
@@ -141,33 +124,48 @@ public class BugSplat implements Runnable {
         return "";
     }
 
-    private static String GetStackKeyFromException(Exception e) {
-
-        // first, we need to backtrace...
-        Throwable t = (Throwable) e;
-        while (t.getCause() != null) {
-            t = t.getCause();
-        }
-
-        StackTraceElement stack[] = t.getStackTrace();
-        if (stack.length > 0) {
-            String className = stack[0].getClassName();
-            String methodName = stack[0].getMethodName();
-            int line = stack[0].getLineNumber();
-
-            // added line
-            return className + "." + methodName + "(" + line + ")";
-        }
-
-        return "";
+    private static void SetMFA(String MFA) {
+        m_strMFA = MFA;
     }
 
     /**
-     * Provide a description of the crash that may be used to interactively
-     * sort/filter crashes on the BugSplat website.
+     * Set the default value for the user description field
+     * this value can be overwritten by the user in the BugSplat dialog
      */
     public static void SetDescription(String description) {
-        m_strDescription = description;
+        m_strUserDescription = description;
+    }
+
+    /**
+     * Set the default value for the email field
+     * this value can be overwritten by the user in the BugSplat dialog
+     */
+    public static void SetEmail(String email) {
+        m_strUserEmail = email;
+    }
+
+    /**
+     * Provide an application key that may be used to load different
+     * variations of the support response page.
+     */
+    public static void SetKey(String key) {
+        m_strKey = key;
+    }
+
+    /**
+     * Provide notes associated with the crash report that can be edited
+     * on the BugSplat website.
+     */
+    public static void SetNotes(String notes) {
+        m_strNotes = notes;
+    }
+
+    /**
+     * Set the default value for the user field
+     * this value can be overwritten by the user in the BugSplat dialog
+     */
+    public static void SetUser(String user) {
+        m_strUserName = user;
     }
 
     /**
@@ -208,6 +206,10 @@ public class BugSplat implements Runnable {
     public static boolean GetTerminateApplication() {
         return m_terminateApplication;
     }
+
+    /**
+     *
+     */
 
     /**
      * Handle a caught exception with BugSplat. The crash report package will be
@@ -278,14 +280,21 @@ public class BugSplat implements Runnable {
         CreateTempFiles();
 
         // create the main crash dialog
-        BugSplatDialog dialog = new BugSplatDialog(m_requiredFiles, m_additionalFiles, m_bEnableAdditionalFiles, m_bQuietMode);
-		// requestFocus();
+        BugSplatDialog dialog = new BugSplatDialog(
+                m_strUserName,
+                m_strUserEmail,
+                m_strUserDescription,
+                m_requiredFiles,
+                m_additionalFiles,
+                m_bEnableAdditionalFiles,
+                m_bQuietMode
+        );
+        // requestFocus();
 
         // get the values from the dialog
         if (m_bQuietMode == false) {
             m_strUserName = dialog.UserName;
             m_strUserEmail = dialog.UserEmail;
-            m_strUserAddress = dialog.UserAddress;
             m_strUserDescription = dialog.UserDescription;
             m_bEnableAdditionalFiles = dialog.m_enableAdditionalFiles;
         }
@@ -300,22 +309,12 @@ public class BugSplat implements Runnable {
 
     private static void SendData(Exception e, BugSplatProgress progress) {
         try {
-            // get the IP address
             GetIPAddressForLocalHost();
 
-            // get the MFA from the stack trace
-            SetMFA(GetMFAFromException(e));
-
-            // get the stack key from the stack trace
-            SetStackKey(GetStackKeyFromException(e));
-
-            // create a report from the stack trace
             CreateReport(e);
 
-            // collect the info entered on the crash dialog
             CollectUserInfo();
 
-            // zip up the required and additional files
             CreateZip();
 
             if (progress.Cancelled == true) {
@@ -324,33 +323,50 @@ public class BugSplat implements Runnable {
             
             progress.setTaskComplete(BugSplatProgress.taskCompilingReport);
 
-            // TODO BG remove
-            if (progress.Cancelled == true) {
-                return;
-            }
-
-            progress.setTaskComplete(BugSplatProgress.taskContactingServer);
-
-            // TODO: need to be able to cancel this
-            CloseableHttpClient client = HttpClients.createDefault();
-            BugSplatReport report = new BugSplatReport(m_strDatabase, m_strAppName, m_strVersion, client);
-            report.PostDumpFile(new File(m_strZipFile), "Java stack trace");
+            BugSplatPostResult postResult = UploadCrashZip();
 
             if (progress.Cancelled == true) {
                 return;
             }
-            
-            // report posted
+
             progress.setTaskComplete(BugSplatProgress.taskSendingReport);
 
-            if (progress.QuietMode == false) {
-                BugSplatReport.HandlePostResponse();
+            if (progress.QuietMode == false && postResult.success) {
+                ShowSupportResponse(postResult.infoUrl);
             }
 
             progress.setVisible(false);
         } catch (Exception e2) {
             System.out.println("Exception in SendData: " + e2.toString());
         }
+    }
+
+    private static void ShowSupportResponse(String infoUrl) {
+        try {
+            // System.out.println("Launching browser: " + infoURL);
+            if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+                Desktop.getDesktop().browse(new URI(infoUrl));
+            }
+        } catch (Exception e) {
+            System.out.println(e.toString());
+        }
+    }
+
+    private static BugSplatPostResult UploadCrashZip() throws Exception {
+        CloseableHttpClient client = HttpClients.createDefault();
+        BugSplatReport report = new BugSplatReport(m_strDatabase, m_strAppName, m_strVersion, client);
+        BugSplatPostOptions options = new BugSplatPostOptions();
+        options.additionalFiles = m_additionalFiles;
+        options.description = m_strUserDescription;
+        options.email = m_strUserEmail;
+        options.mfa = m_strMFA;
+        options.notes = m_strNotes;
+        options.key = m_strKey;
+        options.user = m_strUserName;
+        BugSplatPostResult result = report.PostDumpFile(new File(m_strZipFile), options);
+        // TODO BG needed?
+        client.close();
+        return result;
     }
 
     private static void CreateTempFiles() {
@@ -388,7 +404,7 @@ public class BugSplat implements Runnable {
         String datetime = dateFormat1.format(new Date()) + " "
                 + dateFormat2.format(new Date());
 
-		// NOTE: we need to wrap most elements in CDATA sections
+        // NOTE: we need to wrap most elements in CDATA sections
         // characters such as < and > will causes errors when user.xml is read
         // these can come from user input on the crash dialog or from the MFA
         try {
@@ -425,7 +441,7 @@ public class BugSplat implements Runnable {
 
             out.write("  <Description>");
             out.write("<![CDATA[");
-            out.write(m_strDescription);
+            out.write(m_strKey);
             out.write("]]>");
             out.write("</Description>\n");
 
@@ -446,12 +462,6 @@ public class BugSplat implements Runnable {
             out.write(m_strUserEmail);
             out.write("]]>");
             out.write("</Email>\n");
-
-            out.write("   <Postal>");
-            out.write("<![CDATA[");
-            out.write(m_strUserAddress);
-            out.write("]]>");
-            out.write("</Postal>\n");
 
             out.write("   <IPAddress>");
             out.write("<![CDATA[");
@@ -517,16 +527,12 @@ public class BugSplat implements Runnable {
 
             StackTraceElement stack[] = t.getStackTrace();
 
-			// stack[0] contains the method that created the exception.
+            // stack[0] contains the method that created the exception.
             // stack[stack.length-1] contains the oldest method call.
             // Enumerate each stack element.
             for (int i = 0; i < stack.length; i++) {
 
                 String filename = stack[i].getFileName();
-
-                if (filename == null) {
-                    // The source filename is not available
-                }
 
                 String className = stack[i].getClassName();
                 String methodName = stack[i].getMethodName();
@@ -534,7 +540,7 @@ public class BugSplat implements Runnable {
                 boolean isNativeMethod = stack[i].isNativeMethod();
                 int lineNumber = stack[i].getLineNumber();
 
-				// TODO: should we use toString?
+                // TODO: should we use toString?
                 // out.write(className + "::" + methodName + "(" + lineNumber + ")\n");
                 String msg = className + "." + methodName;
 
@@ -546,7 +552,7 @@ public class BugSplat implements Runnable {
                     out.write("   <func><![CDATA[" + msg + "]]></func>\n");  // stack key
                     out.write("   <code><![CDATA[" + t.getMessage() + "]]></code>\n");
 
-					// not sure how to handle the Source info, so for now I'm just sticking
+                    // not sure how to handle the Source info, so for now I'm just sticking
                     // it in the explanation field
                     out.write("   <explanation><![CDATA[" + t.toString() + "]]></explanation>\n");
                     out.write("   <file>" + fileName + "</file>\n");
@@ -575,8 +581,6 @@ public class BugSplat implements Runnable {
             out.write("</report>\n");
 
             out.close();
-
-            m_reportCreated = true;
 
             // System.out.println("Stack trace: " + temp.toString());
         } catch (IOException ioe) {
@@ -609,7 +613,7 @@ public class BugSplat implements Runnable {
             ZipOutputStream out = new ZipOutputStream(new FileOutputStream(zipFileName));
             m_strZipFile = zipFileName;
 
-			      //
+            //
             // stack file
             //
             System.out.println("Stackfile: " + m_strStackFile);
@@ -635,7 +639,7 @@ public class BugSplat implements Runnable {
             File temp1 = new File(m_strStackFile);
             temp1.delete();
 
-			//
+            //
             // user file
             //
             System.out.println("Userfile: " + m_strUserFile);
@@ -660,7 +664,7 @@ public class BugSplat implements Runnable {
             File temp2 = new File(m_strUserFile);
             temp2.delete();
 
-			//
+            //
             // additional files
             //
             if (m_bEnableAdditionalFiles == true) {

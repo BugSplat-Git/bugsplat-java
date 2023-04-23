@@ -6,6 +6,15 @@ plugins {
     // Apply the common convention plugin for shared build configuration between library and application projects.
     id("com.bugsplat.java-common-conventions")
 
+    // https://www.youtube.com/watch?v=8z5KFCLZDd0
+    id("maven-publish")
+
     // Apply the java-library plugin for API and implementation separation.
     `java-library`
+}
+
+// https://www.youtube.com/watch?v=8z5KFCLZDd0
+publishing {
+    publications.create<MavenPublication>("lib").from(components["java"])
+    repositories.maven("/Users/bobby/Desktop/maven")
 }

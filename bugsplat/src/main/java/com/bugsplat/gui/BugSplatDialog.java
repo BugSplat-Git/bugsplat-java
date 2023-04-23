@@ -34,7 +34,6 @@ public class BugSplatDialog extends JDialog implements ActionListener
 	public String UserDescription = "";
 	public String UserName = "";
 	public String UserEmail = "";
-	public String UserAddress = "";
 
 	ArrayList m_requiredFiles;
 	ArrayList m_additionalFiles;
@@ -42,8 +41,7 @@ public class BugSplatDialog extends JDialog implements ActionListener
 
 	TextArea input1;
     TextField input2,
- 	          input3,
-	          input4;
+ 	          input3;
 	JButton ok, cancel, details;
 
 	String message1 = "A problem has been encountered and the program needs to close.\n \n" +
@@ -62,7 +60,15 @@ public class BugSplatDialog extends JDialog implements ActionListener
 	                  "Your email address will never be used for marketing or any other purposes.\n";
 
 
-	public BugSplatDialog(ArrayList requiredFiles, ArrayList additionalFiles, boolean enableAdditionalFiles, boolean quietMode)
+	public BugSplatDialog(
+			String user,
+			String email,
+			String description,
+			ArrayList requiredFiles,
+			ArrayList additionalFiles,
+			boolean enableAdditionalFiles,
+			boolean quietMode
+	)
 	{
 		super(new JFrame(), "Error Report", true);
 
@@ -75,37 +81,29 @@ public class BugSplatDialog extends JDialog implements ActionListener
 		JPanel p1 = new JPanel();
 		p1.setLayout(new BorderLayout(8,8));
 		p1.add(BorderLayout.NORTH, new BugSplatLabel(message1, BugSplatLabel.LEFT, false));
-		input1 = new TextArea("", 5, 50, TextArea.SCROLLBARS_VERTICAL_ONLY);
+		input1 = new TextArea(description, 5, 50, TextArea.SCROLLBARS_VERTICAL_ONLY);
 		p1.add(BorderLayout.CENTER, input1);
 		p1.add(BorderLayout.SOUTH, new BugSplatLabel(message2, BugSplatLabel.LEFT, false));
 
 		// name Panel
 		JPanel p2 = new JPanel();
 		p2.setLayout(new BorderLayout(8,8));
-		input2 = new TextField("", 24);
+		input2 = new TextField(user, 24);
 		p2.add(BorderLayout.NORTH, new BugSplatLabel("Name: (optional)", BugSplatLabel.LEFT, false));
 		p2.add(BorderLayout.CENTER, input2);
 
 		// email Panel
 		JPanel p3 = new JPanel();
 		p3.setLayout(new BorderLayout(8,8));
-		input3 = new TextField("", 24);
+		input3 = new TextField(email, 24);
 		p3.add(BorderLayout.NORTH, new BugSplatLabel("Email Address: (optional)", BugSplatLabel.LEFT, false));
 		p3.add(BorderLayout.CENTER, input3);
-
-		// address Panel
-		JPanel p4 = new JPanel();
-		p4.setLayout(new BorderLayout(8,8));
-		input4 = new TextField("", 50);
-		p4.add(BorderLayout.NORTH, new BugSplatLabel("Postal Address: (optional)", BugSplatLabel.LEFT, false));
-		p4.add(BorderLayout.CENTER, input4);
 
 		// another Panel
 		JPanel p5 = new JPanel();
 		p5.setLayout(new BorderLayout(8,8));
 		p5.add(BorderLayout.WEST, p2);
 		p5.add(BorderLayout.CENTER, p3);
-		p5.add(BorderLayout.SOUTH, p4);
 
 		// add OK Cancel Panel
 		JPanel p6 = new JPanel();
@@ -168,7 +166,6 @@ public class BugSplatDialog extends JDialog implements ActionListener
 			UserDescription = input1.getText();
 			UserName = input2.getText();
 			UserEmail = input3.getText();
-			UserAddress = input4.getText();
 
 			Result = true;
 			ResultString = "Report sent.";

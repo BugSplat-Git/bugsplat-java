@@ -9,145 +9,132 @@
 package com.bugsplat.app;
 
 import java.io.*;
+
 import com.bugsplat.BugSplat;
 
-public class MyJavaCrasherConsole
-{
-    public static void main(String[] args)
-    {
-		try {
-  		//String tmpDirName = System.getProperty("java.io.tmpdir");
-      //System.out.println("java.io.tmpdir = " + tmpDirName);
-      //if (tmpDirName.endsWith(File.separator)) {
-      //  System.out.println("java.io.tmpdir ends with File.separator");
-      //  tmpDirName = tmpDirName + File.separator;
-      //  System.out.println(tmpDirName);
-      //}
-      //else {
-      //  System.out.println("java.io.tmpdir does not end with File.separator");
-      //}
+public class MyJavaCrasherConsole {
+    public static void main(String[] args) {
+        try {
+            // init the bugsplat library with the required parameters
+            BugSplat.Init("Fred", "MyJavaCrasherConsole", "1.0");
 
-			// init the bugsplat library with the required parameters
-			BugSplat.Init("Fred", "MyJavaCrasherConsole", "1.0");
+            // optionally set crash dialog defaults
+            BugSplat.SetUser("Fred");
+            BugSplat.SetEmail("fred@bugsplat.com");
+            BugSplat.SetDescription("Please enter a description");
 
-			// set optional parameters
-			BugSplat.SetDescription("Java console application");
+            // optionally set key to display associated support response page configured in BugSplat web app
+            BugSplat.SetKey("en-US");
 
-			// set optional parameters
-			File additionalFile = new File("additional.txt");
-			if (additionalFile.exists())
-				BugSplat.AddAdditionalFile(additionalFile.getAbsolutePath());
+            // optionally set notes field with arbitrary info
+            BugSplat.SetNotes("bobby testing notes");
 
-			// suppress all dialogs
-			BugSplat.SetQuietMode(true);
+            // optionally add file attachments
+            File additionalFile = new File("additional.txt");
+            if (additionalFile.exists()) {
+                BugSplat.AddAdditionalFile(additionalFile.getAbsolutePath());
+            }
 
-			// get the command line arguments
-			String opt = "1";
-			if (null != args && args.length > 0) {
-				opt = args[0];
-			}
+            // suppress all dialogs
+            BugSplat.SetQuietMode(true);
 
-			if (opt.compareTo("1") == 0) {
-				NullPointerTest();
-			}
-			else if (opt.compareTo("2") == 0) {
-				DivideByZeroTest();
-			}
-			else if (opt.compareTo("3") == 0) {
-				ArrayIndexTest();
-			}
-			else if (opt.compareTo("4") == 0) {
-				NegativeArraySizeTest();
-			}
-			else if (opt.compareTo("5") == 0) {
-				ChainedExceptionTest();
-			}
-		}
-		catch (Exception e) {
-			// let the BugSplat library report the exception
-			BugSplat.HandleException(e);
-		}
-		catch (Throwable t) {
-			// construct an exception and let the BugSplat library report it
-			BugSplat.HandleException(new Exception(t));
-		}
+            // get the command line arguments
+            String opt = "1";
+            if (null != args && args.length > 0) {
+                opt = args[0];
+            }
 
-		// do not terminate the app, otherwise the report will not be posted
-		// System.exit(1);
+            if (opt.compareTo("1") == 0) {
+                NullPointerTest();
+            } else if (opt.compareTo("2") == 0) {
+                DivideByZeroTest();
+            } else if (opt.compareTo("3") == 0) {
+                ArrayIndexTest();
+            } else if (opt.compareTo("4") == 0) {
+                NegativeArraySizeTest();
+            } else if (opt.compareTo("5") == 0) {
+                ChainedExceptionTest();
+            }
+        } catch (Exception e) {
+            // let the BugSplat library report the exception
+            BugSplat.HandleException(e);
+        } catch (Throwable t) {
+            // construct an exception and let the BugSplat library report it
+            BugSplat.HandleException(new Exception(t));
+        }
 
-		// tell the BugSplat handler to terminate the app (optional)
-		BugSplat.SetTerminateApplication(true);
+        // do not terminate the app, otherwise the report will not be posted
+        // System.exit(1);
+
+        // tell the BugSplat handler to terminate the app (optional)
+        BugSplat.SetTerminateApplication(true);
     }
 
-	//
-	// null pointer test
-	//
-    private static void NullPointerTest()
-    {
-		Object o = null;
-		String temp = o.toString();
+    //
+    // null pointer test
+    //
+    private static void NullPointerTest() {
+        Object o = null;
+        String temp = o.toString();
     }
 
-	//
-	// divide by zero test
-	//
-    private static void DivideByZeroTest()
-    {
-		int x = 1;
-		int y = 0;
-		int z = x / y;
+    //
+    // divide by zero test
+    //
+    private static void DivideByZeroTest() {
+        int x = 1;
+        int y = 0;
+        int z = x / y;
     }
 
-	//
-	// invalid array index test
-	//
-    private static void ArrayIndexTest()
-    {
-	    String arr[] = {"One", "Two"};
-	    String temp = arr[2];
+    //
+    // invalid array index test
+    //
+    private static void ArrayIndexTest() {
+        String arr[] = {"One", "Two"};
+        String temp = arr[2];
     }
 
-	//
-	// negative array size test
-	//
-    private static void NegativeArraySizeTest()
-    {
-	    int len = -1;
-	    String arr[] = new String[len];
+    //
+    // negative array size test
+    //
+    private static void NegativeArraySizeTest() {
+        int len = -1;
+        String arr[] = new String[len];
     }
 
-	//
-	// chained exception test
-	//
+    //
+    // chained exception test
+    //
     private static void ChainedExceptionTest() throws Error {
-    	ChainedException1();
+        ChainedException1();
     }
 
-	private static void ChainedException1() throws Error {
-		try {
-			ChainedException2();
-		} catch(RuntimeException e) {
-			throw new Error(e);
-		}
-	}
+    private static void ChainedException1() throws Error {
+        try {
+            ChainedException2();
+        } catch (RuntimeException e) {
+            throw new Error(e);
+        }
+    }
 
-	private static void ChainedException2() throws RuntimeException {
-		ChainedException3();
-	}
+    private static void ChainedException2() throws RuntimeException {
+        ChainedException3();
+    }
 
-	private static void ChainedException3() throws RuntimeException {
-		try {
-			ChainedException4();
-		} catch(IOException e) {
-			throw new RuntimeException(e);
-		}
-	}
+    private static void ChainedException3() throws RuntimeException {
+        try {
+            ChainedException4();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
-	private static void ChainedException4() throws IOException {
-		ChainedException5();
-	}
+    private static void ChainedException4() throws IOException {
+        ChainedException5();
+    }
 
-	private static void ChainedException5() throws IOException {
-		throw new IOException();
-	}
+    private static void ChainedException5() throws IOException {
+        throw new IOException();
+    }
 }

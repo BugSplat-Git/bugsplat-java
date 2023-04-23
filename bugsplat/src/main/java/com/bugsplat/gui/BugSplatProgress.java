@@ -20,12 +20,11 @@ import javax.swing.BorderFactory;
 
 public class BugSplatProgress extends JDialog implements ActionListener {
 
-    private static final String image1 = "images/BugSplatHeader350x49.gif";
-    private static final String image2 = "images/BugSplatUpload64x64.gif";
+    private static final String image1 = "resources/BugSplatHeader350x49.gif";
+    private static final String image2 = "resources/BugSplatUpload64x64.gif";
 
     public static final int taskCompilingReport = 1;
-    public static final int taskContactingServer = 2;
-    public static final int taskSendingReport = 3;
+    public static final int taskSendingReport = 2;
 
     boolean Result = true;
     public boolean Cancelled = false;
@@ -36,14 +35,11 @@ public class BugSplatProgress extends JDialog implements ActionListener {
 
     String message1a = "Generating error report . . . ";
     String message1b = message1a + "done";
-    String message2a = "Contacting server . . . ";
-    String message2b = message2a + "done";
     String message3a = "Posting data . . . ";
     String message3b = message3a + "done";
     String message4 = "Thank you for sending this error report. \n It has been received successfully.";
 
     private BugSplatLabel label1; // message1
-    private BugSplatLabel label2; // message2
     private BugSplatLabel label3; // message3
     private BugSplatLabel label4; // message4
 
@@ -61,7 +57,6 @@ public class BugSplatProgress extends JDialog implements ActionListener {
 
         // messages
         label1 = new BugSplatLabel(message1b, BugSplatLabel.LEFT, false);
-        label2 = new BugSplatLabel(message2b, BugSplatLabel.LEFT, false);
         label3 = new BugSplatLabel(message3b, BugSplatLabel.LEFT, false);
         label4 = new BugSplatLabel(message4, BugSplatLabel.LEFT, false);
 
@@ -79,7 +74,6 @@ public class BugSplatProgress extends JDialog implements ActionListener {
         JPanel p2 = new JPanel();
         p2.setLayout(new GridLayout(3, 1));
         p2.add(label1);
-        p2.add(label2);
         p2.add(label3);
 
         JPanel p3 = new JPanel();
@@ -142,7 +136,6 @@ public class BugSplatProgress extends JDialog implements ActionListener {
         // hide
         label1.setText(message1a);
         label1.setVisible(true);
-        label2.setVisible(false);
         label3.setVisible(false);
         label4.setVisible(false);
 
@@ -179,14 +172,6 @@ public class BugSplatProgress extends JDialog implements ActionListener {
         if (task == taskCompilingReport) {
             label1.setText(message1b);
             label1.setVisible(true);
-            label2.setText(message2a);
-            label2.setVisible(true);
-        }
-        if (task == taskContactingServer) {
-            label2.setText(message2b);
-            label2.setVisible(true);
-            label3.setText(message3a);
-            label3.setVisible(true);
         }
         if (task == taskSendingReport) {
             label3.setText(message3b);

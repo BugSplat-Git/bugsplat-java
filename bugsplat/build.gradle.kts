@@ -8,5 +8,6 @@ plugins {
 
 dependencies {
     implementation("org.apache.httpcomponents:httpclient:4.5.14")
+    implementation("org.apache.httpcomponents:httpmime:4.5.14")
     implementation("org.json:json:20230227")
 }

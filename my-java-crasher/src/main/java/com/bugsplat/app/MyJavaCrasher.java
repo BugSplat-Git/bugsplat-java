@@ -126,10 +126,18 @@ public class MyJavaCrasher implements ActionListener {
             // init the bugsplat library with the database, application and version parameters
             BugSplat.Init("Fred", "MyJavaCrasher", "1.0");
 
-            // set optional parameters
-            BugSplat.SetDescription("Java application");
+            // optionally set crash dialog defaults
+            BugSplat.SetUser("Fred");
+            BugSplat.SetEmail("fred@bugsplat.com");
+            BugSplat.SetDescription("Please enter a description");
 
-            // set optional parameters
+            // optionally set key to display associated support response page configured in BugSplat web app
+            BugSplat.SetKey("en-US");
+
+            // optionally set notes field with arbitrary info
+            BugSplat.SetNotes("bobby testing notes");
+
+            // optionally add file attachments
             File additionalFile = new File("additional.txt");
             if (additionalFile.exists()) {
                 BugSplat.AddAdditionalFile(additionalFile.getAbsolutePath());
