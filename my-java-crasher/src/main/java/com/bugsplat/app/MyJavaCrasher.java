@@ -5,6 +5,7 @@
 //
 // Copyright 2014 BugSplat, LLC.
 //
+package com.bugsplat.app;
 
 import java.awt.*;
 import java.awt.event.*;

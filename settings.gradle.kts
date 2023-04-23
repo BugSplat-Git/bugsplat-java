@@ -13,4 +13,4 @@ plugins {
 }
 
 rootProject.name = "bugsplat-java"
-include("my-java-crasher-console", "bugsplat")
+include("my-java-crasher-console", "my-java-crasher", "bugsplat")
