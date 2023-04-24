@@ -6,3 +6,6 @@ build
 
 # Signing
 *.gpg
+
+# Windows build artifacts
+bin
