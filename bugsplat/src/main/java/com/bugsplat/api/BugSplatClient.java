@@ -5,12 +5,12 @@
 //
 // Copyright 2005 BugSplat, LLC.
 //
-package com.bugsplat.util;
+package com.bugsplat.api;
 
-import com.bugsplat.api.BugSplatPostOptions;
-import com.bugsplat.api.BugSplatPostResult;
+import com.bugsplat.http.BugSplatHttpClientFactory;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -25,10 +25,9 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.IOException;
 
-public class BugSplatReport {
+public class BugSplatClient {
 
-    // TODO BG dep injection (spring?)
-    private final CloseableHttpClient httpClient;
+    private final BugSplatHttpClientFactory httpClientFactory;
 
     private final String database;
     private final String application;
@@ -37,33 +36,45 @@ public class BugSplatReport {
     final static int crashTypeId = 4;
 
     // TODO BG http client factory
-    public BugSplatReport(String database, String application, String version, CloseableHttpClient httpClient) {
+    public BugSplatClient(
+            String database,
+            String application,
+            String version,
+            BugSplatHttpClientFactory httpClientFactory
+    ) {
         this.database = database;
         this.application = application;
         this.version = version;
-        this.httpClient = httpClient;
+        this.httpClientFactory = httpClientFactory;
     }
 
     //
     // post the zip file to the BugSplat server
     //
     public BugSplatPostResult PostDumpFile(File crashZip, BugSplatPostOptions options) throws Exception {
+        CloseableHttpClient httpClient = this.httpClientFactory.create();
+
         System.out.println("Getting pre-signed url...");
 
-        String crashUploadUrl = getCrashUploadUrl(crashZip);
+        String crashUploadUrl = getCrashUploadUrl(httpClient, crashZip);
 
         System.out.println("Upload crash zip file...");
 
-        HttpResponse crashUploadResponse = uploadCrashZipToS3(crashZip, crashUploadUrl);
+        HttpResponse crashUploadResponse = uploadCrashZipToS3(httpClient, crashZip, crashUploadUrl);
 
         System.out.println("Committing crash to BugSplat...");
 
         String md5 = getETagFromResponseUnquoted(crashUploadResponse);
         BugSplatPostResult result = commitS3CrashUpload(
+                httpClient,
                 crashUploadUrl,
                 md5,
                 options
         );
+
+        System.out.println("Upload complete!");
+
+        httpClient.close();
 
         return result;
     }
@@ -74,7 +85,7 @@ public class BugSplatReport {
         return eTagUnquoted;
     }
 
-    private BugSplatPostResult commitS3CrashUpload(String crashUploadUrl, String md5, BugSplatPostOptions options) throws IOException {
+    private BugSplatPostResult commitS3CrashUpload(HttpClient httpClient, String crashUploadUrl, String md5, BugSplatPostOptions options) throws IOException {
         String commitS3CrashUrl = String.format("https://%s.bugsplat.com/api/commitS3CrashUpload", this.database);
         HttpPost commitCrashRequest = new HttpPost(commitS3CrashUrl);
         MultipartEntityBuilder builder = MultipartEntityBuilder.create()
@@ -104,7 +115,7 @@ public class BugSplatReport {
 
         HttpEntity entity = builder.build();
         commitCrashRequest.setEntity(entity);
-        HttpResponse commitCrashResponse = this.httpClient.execute(commitCrashRequest);
+        HttpResponse commitCrashResponse = httpClient.execute(commitCrashRequest);
 
         HttpEntity getCrashUploadUrlEntity = commitCrashResponse.getEntity();
         String getCrashUploadUrlResponseBody = EntityUtils.toString(getCrashUploadUrlEntity);
@@ -120,16 +131,16 @@ public class BugSplatReport {
         return new BugSplatPostResult(success, infoUrl);
     }
 
-    private HttpResponse uploadCrashZipToS3(File crashZip, String crashUploadUrl) throws IOException {
+    private HttpResponse uploadCrashZipToS3(HttpClient httpClient, File crashZip, String crashUploadUrl) throws IOException {
         HttpPut uploadRequest = new HttpPut(crashUploadUrl);
         FileEntity reqEntity = new FileEntity(crashZip, "application/octet-stream");
         reqEntity.setContentType("application/octet-stream");
         uploadRequest.setEntity(reqEntity);
-        HttpResponse response = this.httpClient.execute(uploadRequest);
+        HttpResponse response = httpClient.execute(uploadRequest);
         return response;
     }
 
-    private String getCrashUploadUrl(File zipfile) throws IOException {
+    private String getCrashUploadUrl(HttpClient httpClient, File zipfile) throws IOException {
         String getCrashUploadUrl = String.format(
             "https://%s.bugsplat.com/api/getCrashUploadUrl?database=%s&appName=%s&appVersion=%s&crashPostSize=%s",
             this.database,
@@ -139,7 +150,7 @@ public class BugSplatReport {
             zipfile.length()
         );
         HttpGet getCrashUploadUrlRequest = new HttpGet(getCrashUploadUrl);
-        CloseableHttpResponse getCrashUploadUrlResponse = this.httpClient.execute(getCrashUploadUrlRequest);
+        HttpResponse getCrashUploadUrlResponse = httpClient.execute(getCrashUploadUrlRequest);
         HttpEntity getCrashUploadUrlEntity = getCrashUploadUrlResponse.getEntity();
         String getCrashUploadUrlResponseBody = EntityUtils.toString(getCrashUploadUrlEntity);
         JSONObject getCrashUploadUrlResponseJson = new JSONObject(getCrashUploadUrlResponseBody);

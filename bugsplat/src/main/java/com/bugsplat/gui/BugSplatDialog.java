@@ -25,7 +25,7 @@ import com.bugsplat.gui.BugSplatViewDetails;
 
 public class BugSplatDialog extends JDialog implements ActionListener
 {
-	private static final String image1 = "images/BugSplatHeader440x49.gif";
+	private static final String image1 = "/bugsplat-java-header-500x50.gif";
 
 	public boolean Result = true;
 	String ResultString = "";

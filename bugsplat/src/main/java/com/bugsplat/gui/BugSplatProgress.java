@@ -20,8 +20,8 @@ import javax.swing.BorderFactory;
 
 public class BugSplatProgress extends JDialog implements ActionListener {
 
-    private static final String image1 = "resources/BugSplatHeader350x49.gif";
-    private static final String image2 = "resources/BugSplatUpload64x64.gif";
+    private static final String image1 = "/bugsplat-java-progress-350x50.gif";
+    private static final String image2 = "/BugSplatUpload64x64.gif";
 
     public static final int taskCompilingReport = 1;
     public static final int taskSendingReport = 2;

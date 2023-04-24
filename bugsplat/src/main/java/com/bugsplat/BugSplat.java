@@ -13,8 +13,11 @@ import java.util.*;
 import java.util.zip.*;
 import java.text.*;
 
+import com.bugsplat.api.BugSplatClient;
 import com.bugsplat.api.BugSplatPostOptions;
 import com.bugsplat.api.BugSplatPostResult;
+import com.bugsplat.http.BugSplatHttpClientFactory;
+import com.bugsplat.http.BugSplatHttpClientFactoryImpl;
 import com.bugsplat.util.*;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -65,10 +68,12 @@ public class BugSplat implements Runnable {
 
     private static Exception m_ex = null;
 
+    private static BugSplatHttpClientFactory httpClientFactory = new BugSplatHttpClientFactoryImpl();
+
     /**
      * Initialize database, application and version. These are required for
-     * validation when the report is sent to the BugSplat web site and for
-     * organizational purposes when navigating the web site interactively.
+     * validation when the report is sent to the BugSplat website and for
+     * organizational purposes when navigating the website interactively.
      */
     public static void Init(
             String szDatabase, /* database on bugsplat.com */
@@ -206,10 +211,6 @@ public class BugSplat implements Runnable {
     public static boolean GetTerminateApplication() {
         return m_terminateApplication;
     }
-
-    /**
-     *
-     */
 
     /**
      * Handle a caught exception with BugSplat. The crash report package will be
@@ -354,7 +355,12 @@ public class BugSplat implements Runnable {
 
     private static BugSplatPostResult UploadCrashZip() throws Exception {
         CloseableHttpClient client = HttpClients.createDefault();
-        BugSplatReport report = new BugSplatReport(m_strDatabase, m_strAppName, m_strVersion, client);
+        BugSplatClient report = new BugSplatClient(
+                m_strDatabase,
+                m_strAppName,
+                m_strVersion,
+                httpClientFactory
+        );
         BugSplatPostOptions options = new BugSplatPostOptions();
         options.additionalFiles = m_additionalFiles;
         options.description = m_strUserDescription;
