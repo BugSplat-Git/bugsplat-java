@@ -1,3 +1,8 @@
+<<<<<<< HEAD
 {
     "java.configuration.updateBuildConfiguration": "automatic"
+=======
+{
+    "java.configuration.updateBuildConfiguration": "automatic"
+>>>>>>> 1d9fecf (chore: remove maven-publish from shared config)
 }
