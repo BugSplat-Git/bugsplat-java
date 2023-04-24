@@ -69,6 +69,10 @@ try {
 }
 ```
 
+## 🗺️ Samples
+
+This repo includes sample projects that demonstrate how to integrate `bugsplat-java`. Please review the [my-java-crasher](https://github.com/BugSplat-Git/bugsplat-java/tree/master/my-java-crasher) and [my-java-crasher-console](https://github.com/BugSplat-Git/bugsplat-java/tree/master/my-java-crasher-console) folders for more a sample implementation. To run the sample projects, clone this repo and open it in either [IntelliJ IDEA](https://www.jetbrains.com/idea/) or [VS Code](https://code.visualstudio.com/).
+
 ## ✅ Verification
 
 Once you've generated an error, navigate to the BugSplat [Dashboard](https://app.bugsplat.com/v2/dashboard) and ensure you have to correct database selected in the dropdown menu. You should see a new error report under the **Recent Crashes** section:
