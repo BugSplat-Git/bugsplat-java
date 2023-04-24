@@ -69,6 +69,20 @@ try {
 }
 ```
 
+If your application uses [threads](https://docs.oracle.com/javase/7/docs/api/java/lang/Thread.html), add a call to `BugSplat.handleException` in `uncaughtException` to post a report to BugSplat before the thread is terminated.
+
+```java
+class MyThreadGroup extends ThreadGroup {
+  public MyThreadGroup (String s) {
+      super(s);
+  }
+
+  public void uncaughtException(Thread thread, Throwable throwable) {
+      BugSplat.handleException(new Exception(throwable));                     
+  }
+}
+```
+
 ## 🗺️ Samples
 
 This repo includes sample projects that demonstrate how to integrate `bugsplat-java`. Please review the [my-java-crasher](https://github.com/BugSplat-Git/bugsplat-java/tree/master/my-java-crasher) and [my-java-crasher-console](https://github.com/BugSplat-Git/bugsplat-java/tree/master/my-java-crasher-console) folders for more a sample implementation. To run the sample projects, clone this repo and open it in either [IntelliJ IDEA](https://www.jetbrains.com/idea/) or [VS Code](https://code.visualstudio.com/).
