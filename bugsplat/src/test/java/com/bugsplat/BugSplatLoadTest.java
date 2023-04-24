@@ -2,8 +2,6 @@ package com.bugsplat;
 
 import java.util.Date;
 
-import com.bugsplat.BugSplat;
-
 /*
  * Created on Nov 10, 2006
  *
@@ -23,12 +21,12 @@ public class BugSplatLoadTest
     {
         try
         {
-            BugSplat.Init("Fred", "MyJavaCrasher", "1.0");
-            BugSplat.SetQuietMode(true);
+            BugSplat.init("Fred", "MyJavaCrasher", "1.0");
+            BugSplat.setQuietMode(true);
             for(int i=0;i<1000;i++)
             {
                 System.out.println("======================"+i+"====================== "+new Date());
-                BugSplat.HandleException(new Exception(""+i));
+                BugSplat.handleException(new Exception(""+i));
                 Thread.sleep(1000);
             }
             System.out.println("End of test");

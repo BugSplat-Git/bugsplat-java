@@ -45,7 +45,7 @@ public class BugSplat implements Runnable {
     private static String m_strKey = "";
     private static String m_strNotes = "";
     private static String m_strMFA = "";
-    private static ArrayList m_additionalFiles = new ArrayList();
+    private final static ArrayList<String> m_additionalFiles = new ArrayList<>();
 
     // dialog data
     private static String m_strUserName = "";
@@ -62,31 +62,31 @@ public class BugSplat implements Runnable {
 
     private static String m_strUserFile = "";
     private static String m_strStackFile = "";
-    private static ArrayList m_requiredFiles = new ArrayList();
+    private static final ArrayList<String> m_requiredFiles = new ArrayList<>();
     private static String m_strZipFile = "";
     private static boolean m_terminateApplication = false;
 
     private static Exception m_ex = null;
 
-    private static BugSplatHttpClientFactory httpClientFactory = new BugSplatHttpClientFactoryImpl();
+    private static final BugSplatHttpClientFactory httpClientFactory = new BugSplatHttpClientFactoryImpl();
 
     /**
      * Initialize database, application and version. These are required for
      * validation when the report is sent to the BugSplat website and for
      * organizational purposes when navigating the website interactively.
      */
-    public static void Init(
-            String szDatabase, /* database on bugsplat.com */
-            String szAppName, /* application name */
-            String szVersion /* version identifier */
+    public static void init(
+            String database, /* database on bugsplat.com */
+            String application, /* application name */
+            String version /* version identifier */
     ) {
-        m_strDatabase = szDatabase;
-        m_strAppName = szAppName;
-        m_strVersion = szVersion;
+        m_strDatabase = database;
+        m_strAppName = application;
+        m_strVersion = version;
 
     }
 
-    private static void GetIPAddressForLocalHost() {
+    private static void getIPAddressForLocalHost() {
         try {
             // returns the host name/ip address
             InetAddress inet = InetAddress.getLocalHost();
@@ -103,14 +103,14 @@ public class BugSplat implements Runnable {
 
             m_strIPAddress = raw0 + "." + raw1 + "." + raw2 + "." + raw3;
         } catch (Exception e) {
-            System.out.println("Exception in GetIPAddressForLocalHost: " + e.toString());
+            System.out.println("Exception in GetIPAddressForLocalHost: " + e);
         }
     }
 
-    private static String GetMFAFromException(Exception e) {
+    private static String getMFAFromException(Exception e) {
 
         // first, we need to backtrace...
-        Throwable t = (Throwable) e;
+        Throwable t = e;
         while (t.getCause() != null) {
             t = t.getCause();
         }
@@ -129,7 +129,7 @@ public class BugSplat implements Runnable {
         return "";
     }
 
-    private static void SetMFA(String MFA) {
+    private static void setMFA(String MFA) {
         m_strMFA = MFA;
     }
 
@@ -137,7 +137,7 @@ public class BugSplat implements Runnable {
      * Set the default value for the user description field
      * this value can be overwritten by the user in the BugSplat dialog
      */
-    public static void SetDescription(String description) {
+    public static void setDescription(String description) {
         m_strUserDescription = description;
     }
 
@@ -145,7 +145,7 @@ public class BugSplat implements Runnable {
      * Set the default value for the email field
      * this value can be overwritten by the user in the BugSplat dialog
      */
-    public static void SetEmail(String email) {
+    public static void setEmail(String email) {
         m_strUserEmail = email;
     }
 
@@ -153,7 +153,7 @@ public class BugSplat implements Runnable {
      * Provide an application key that may be used to load different
      * variations of the support response page.
      */
-    public static void SetKey(String key) {
+    public static void setKey(String key) {
         m_strKey = key;
     }
 
@@ -161,7 +161,7 @@ public class BugSplat implements Runnable {
      * Provide notes associated with the crash report that can be edited
      * on the BugSplat website.
      */
-    public static void SetNotes(String notes) {
+    public static void setNotes(String notes) {
         m_strNotes = notes;
     }
 
@@ -169,7 +169,7 @@ public class BugSplat implements Runnable {
      * Set the default value for the user field
      * this value can be overwritten by the user in the BugSplat dialog
      */
-    public static void SetUser(String user) {
+    public static void setUser(String user) {
         m_strUserName = user;
     }
 
@@ -177,7 +177,7 @@ public class BugSplat implements Runnable {
      * Specify the path to an additional file to be included in the crash report
      * package sent to the BugSplat website.
      */
-    public static void AddAdditionalFile(String additionalFile) {
+    public static void addAdditionalFile(String additionalFile) {
         m_additionalFiles.add(additionalFile);
     }
 
@@ -186,14 +186,14 @@ public class BugSplat implements Runnable {
      * report is sent to the BugSplat website. Calling this method with a true
      * argument inhibits the progress dialog.
      */
-    public static void SetQuietMode(boolean quiet) {
+    public static void setQuietMode(boolean quiet) {
         m_bQuietMode = quiet;
     }
 
     /**
      * Get quiet mode behavior set via SetQuietMode().
      */
-    public static boolean GetQuietMode() {
+    public static boolean getQuietMode() {
         return m_bQuietMode;
     }
 
@@ -201,14 +201,14 @@ public class BugSplat implements Runnable {
      * Set application termination behavior. By default, the application is not
      * terminated after an exception is processed by this class.
      */
-    public static void SetTerminateApplication(boolean terminate) {
+    public static void setTerminateApplication(boolean terminate) {
         m_terminateApplication = terminate;
     }
 
     /**
      * Get application termination behavior set via SetTerminateApplication().
      */
-    public static boolean GetTerminateApplication() {
+    public static boolean getTerminateApplication() {
         return m_terminateApplication;
     }
 
@@ -216,7 +216,7 @@ public class BugSplat implements Runnable {
      * Handle a caught exception with BugSplat. The crash report package will be
      * sent to the BugSplat website.
      */
-    public static void HandleException(Exception ex) {
+    public static void handleException(Exception ex) {
         // save the exception
         m_ex = ex;
 
@@ -241,20 +241,20 @@ public class BugSplat implements Runnable {
         try {
             // TODO BG only show if m_quietMode true?
             // show the main crash dialog
-            boolean Result = BugSplat.ShowDialog();
+            boolean result = BugSplat.showDialog();
 
             // TODO BG only show if m_quietMode true?
             // check if user cancelled
-            if (Result == true) {
+            if (result) {
                 // create the progress dialog
-                BugSplatProgress progress = new BugSplatProgress(BugSplat.GetQuietMode());
+                BugSplatProgress progress = new BugSplatProgress(BugSplat.getQuietMode());
 
                 // send the crash data
-                BugSplat.SendData(m_ex, progress);
+                BugSplat.sendData(m_ex, progress);
 
                 // show the server response
                 if (progress.TaskComplete != BugSplatProgress.taskSendingReport) {
-                    if (BugSplat.GetQuietMode() == false) {
+                    if (!BugSplat.getQuietMode()) {
                         BugSplatDetails details = new BugSplatDetails(progress.ResultString);
                     }
                 }
@@ -265,7 +265,7 @@ public class BugSplat implements Runnable {
                 progress.dispose();
             }
 
-            if (BugSplat.GetTerminateApplication() == true) {
+            if (BugSplat.getTerminateApplication()) {
                 System.exit(1);
             }
         } catch (Exception e) {
@@ -276,9 +276,9 @@ public class BugSplat implements Runnable {
         m_ex = null;
     }
 
-    private static boolean ShowDialog() {
+    private static boolean showDialog() {
         // create the temp files for the stack trace and user info
-        CreateTempFiles();
+        createTempFiles();
 
         // create the main crash dialog
         BugSplatDialog dialog = new BugSplatDialog(
@@ -293,7 +293,7 @@ public class BugSplat implements Runnable {
         // requestFocus();
 
         // get the values from the dialog
-        if (m_bQuietMode == false) {
+        if (!m_bQuietMode) {
             m_strUserName = dialog.UserName;
             m_strUserEmail = dialog.UserEmail;
             m_strUserDescription = dialog.UserDescription;
@@ -308,37 +308,39 @@ public class BugSplat implements Runnable {
         return result;
     }
 
-    private static void SendData(Exception e, BugSplatProgress progress) {
+    private static void sendData(Exception e, BugSplatProgress progress) {
         try {
-            GetIPAddressForLocalHost();
+            getIPAddressForLocalHost();
 
-            CreateReport(e);
+            setMFA(getMFAFromException(e));
 
-            CollectUserInfo();
+            createReport(e);
 
-            CreateZip();
+            collectUserInfo();
 
-            if (progress.Cancelled == true) {
+            createZip();
+
+            if (progress.Cancelled) {
                 return;
             }
             
             progress.setTaskComplete(BugSplatProgress.taskCompilingReport);
 
-            BugSplatPostResult postResult = UploadCrashZip();
+            BugSplatPostResult postResult = uploadCrashZip();
 
-            if (progress.Cancelled == true) {
+            if (progress.Cancelled) {
                 return;
             }
 
             progress.setTaskComplete(BugSplatProgress.taskSendingReport);
 
-            if (progress.QuietMode == false && postResult.success) {
+            if (!progress.QuietMode && postResult.success) {
                 ShowSupportResponse(postResult.infoUrl);
             }
 
             progress.setVisible(false);
         } catch (Exception e2) {
-            System.out.println("Exception in SendData: " + e2.toString());
+            System.out.println("Exception in SendData: " + e2);
         }
     }
 
@@ -349,11 +351,11 @@ public class BugSplat implements Runnable {
                 Desktop.getDesktop().browse(new URI(infoUrl));
             }
         } catch (Exception e) {
-            System.out.println(e.toString());
+            System.out.println(e);
         }
     }
 
-    private static BugSplatPostResult UploadCrashZip() throws Exception {
+    private static BugSplatPostResult uploadCrashZip() throws Exception {
         CloseableHttpClient client = HttpClients.createDefault();
         BugSplatClient report = new BugSplatClient(
                 m_strDatabase,
@@ -375,34 +377,30 @@ public class BugSplat implements Runnable {
         return result;
     }
 
-    private static void CreateTempFiles() {
+    private static void createTempFiles() {
         System.out.println("CreateTempFiles...");
 
         try {
-            File temp1 = null;
-            temp1 = File.createTempFile("user", ".xml");
+            File temp1 = File.createTempFile("user", ".xml");
             m_strUserFile = temp1.toString();
 
-            File temp2 = null;
-            temp2 = File.createTempFile("stack", ".jdmp");
+            File temp2 = File.createTempFile("stack", ".jdmp");
             m_strStackFile = temp2.toString();
 
             m_requiredFiles.clear();
             m_requiredFiles.add(m_strUserFile);
             m_requiredFiles.add(m_strStackFile);
         } catch (IllegalArgumentException iae) {
-            System.out.println("IllegalArgumentException in CreateTempFiles: " + iae.toString());
+            System.out.println("IllegalArgumentException in CreateTempFiles: " + iae);
         } catch (IOException ioe) {
-            System.out.println("IllegalArgumentException in CreateTempFiles: " + ioe.toString());
-        } catch (SecurityException iae) {
-            System.out.println("IllegalArgumentException in CreateTempFiles: " + iae.toString());
+            System.out.println("IOException in CreateTempFiles: " + ioe);
+        } catch (SecurityException se) {
+            System.out.println("SecurityException in CreateTempFiles: " + se);
         }
     }
 
-    private static void CollectUserInfo() {
+    private static void collectUserInfo() {
         System.out.println("CollectUserInfo...");
-
-        File temp = null;
 
         DateFormat dateFormat1 = new SimpleDateFormat("yy-MM-dd");
         DateFormat dateFormat2 = new SimpleDateFormat("HH:mm:ss");
@@ -411,11 +409,11 @@ public class BugSplat implements Runnable {
                 + dateFormat2.format(new Date());
 
         // NOTE: we need to wrap most elements in CDATA sections
-        // characters such as < and > will causes errors when user.xml is read
+        // characters such as < and > will cause errors when user.xml is read
         // these can come from user input on the crash dialog or from the MFA
         try {
             // open the temp file
-            temp = new File(m_strUserFile);
+            File temp = new File(m_strUserFile);
 
             // Write to temp file
             BufferedWriter out = new BufferedWriter(new FileWriter(temp));
@@ -507,26 +505,24 @@ public class BugSplat implements Runnable {
             out.flush();
             out.close();
         } catch (IOException ioe) {
-            System.out.println("IOException in CollectionUserInfo: " + ioe.toString());
+            System.out.println("IOException in CollectionUserInfo: " + ioe);
         } catch (Exception e) {
-            System.out.println("Exception in CollectionUserInfo: " + e.toString());
+            System.out.println("Exception in CollectionUserInfo: " + e);
         }
     }
 
-    private static void CreateReport(Exception ex) {
+    private static void createReport(Exception ex) {
         System.out.println("CreateReport...");
-
-        File temp = null;
 
         try {
             // Create temp file.
-            temp = new File(m_strStackFile);
+            File temp = new File(m_strStackFile);
 
             // Write to temp file
             BufferedWriter out = new BufferedWriter(new FileWriter(temp));
 
             // first, we need to backtrace...
-            Throwable t = (Throwable) ex;
+            Throwable t = ex;
             while (t.getCause() != null) {
                 t = t.getCause();
             }
@@ -560,7 +556,7 @@ public class BugSplat implements Runnable {
 
                     // not sure how to handle the Source info, so for now I'm just sticking
                     // it in the explanation field
-                    out.write("   <explanation><![CDATA[" + t.toString() + "]]></explanation>\n");
+                    out.write("   <explanation><![CDATA[" + t + "]]></explanation>\n");
                     out.write("   <file>" + fileName + "</file>\n");
                     out.write("   <line>" + lineNumber + "</line>\n");
                     out.write("   <registers></registers>\n");
@@ -590,17 +586,15 @@ public class BugSplat implements Runnable {
 
             // System.out.println("Stack trace: " + temp.toString());
         } catch (IOException ioe) {
-            System.out.println("IOException in CreateReport: " + ioe.toString());
+            System.out.println("IOException in CreateReport: " + ioe);
         } catch (Exception e) {
-            System.out.println("Exception in CreateReport: " + e.toString());
+            System.out.println("Exception in CreateReport: " + e);
         }
     }
 
     // http://www.devshed.com/c/a/Java/Zip-Meets-Java/1/
-    private static void CreateZip() {
+    private static void createZip() {
         System.out.println("CreateZip...");
-
-        String zipFileName = "";
 
         try {
             DateFormat dateFormat1 = new SimpleDateFormat("MMddyy");
@@ -612,7 +606,7 @@ public class BugSplat implements Runnable {
             if (!tmpDirName.endsWith(File.separator)) {
               tmpDirName = tmpDirName + File.separator;
             }
-            zipFileName = tmpDirName + m_strDatabase + "Crash_" + date + "_" + time + ".zip";
+            String zipFileName = tmpDirName + m_strDatabase + "Crash_" + date + "_" + time + ".zip";
 
             byte[] buffer = new byte[18024];
 
@@ -673,10 +667,8 @@ public class BugSplat implements Runnable {
             //
             // additional files
             //
-            if (m_bEnableAdditionalFiles == true) {
-                int count = m_additionalFiles.size();
-                for (int i = 0; i < count; i++) {
-                    String additionalFile = (String) m_additionalFiles.get(i);
+            if (m_bEnableAdditionalFiles) {
+                for (String additionalFile : m_additionalFiles) {
                     System.out.println("Userfile: " + additionalFile);
 
                     // remove the path
@@ -702,11 +694,11 @@ public class BugSplat implements Runnable {
 
             System.out.println("Zipfile: " + m_strZipFile);
         } catch (IllegalArgumentException iae) {
-            System.out.println("IllegalArgumentException in CreateZip: " + iae.toString());
+            System.out.println("IllegalArgumentException in CreateZip: " + iae);
         } catch (FileNotFoundException fnfe) {
-            System.out.println("FileNotFoundException in CreateZip: " + fnfe.toString());
+            System.out.println("FileNotFoundException in CreateZip: " + fnfe);
         } catch (IOException ioe) {
-            System.out.println("IOException in CreateZip: " + ioe.toString());
+            System.out.println("IOException in CreateZip: " + ioe);
         }
     }
 }

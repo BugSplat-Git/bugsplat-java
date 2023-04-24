@@ -16,27 +16,27 @@ public class MyJavaCrasherConsole {
     public static void main(String[] args) {
         try {
             // init the bugsplat library with the required parameters
-            BugSplat.Init("Fred", "MyJavaCrasherConsole", "1.0");
+            BugSplat.init("Fred", "MyJavaCrasherConsole", "1.0");
 
             // optionally set crash dialog defaults
-            BugSplat.SetUser("Fred");
-            BugSplat.SetEmail("fred@bugsplat.com");
-            BugSplat.SetDescription("Please enter a description");
+            BugSplat.setUser("Fred");
+            BugSplat.setEmail("fred@bugsplat.com");
+            BugSplat.setDescription("Please enter a description");
 
             // optionally set key to display associated support response page configured in BugSplat web app
-            BugSplat.SetKey("en-US");
+            BugSplat.setKey("en-US");
 
             // optionally set notes field with arbitrary info
-            BugSplat.SetNotes("bobby testing notes");
+            BugSplat.setNotes("bobby testing notes");
 
             // optionally add file attachments
             File additionalFile = new File("additional.txt");
             if (additionalFile.exists()) {
-                BugSplat.AddAdditionalFile(additionalFile.getAbsolutePath());
+                BugSplat.addAdditionalFile(additionalFile.getAbsolutePath());
             }
 
             // suppress all dialogs
-            BugSplat.SetQuietMode(true);
+            BugSplat.setQuietMode(true);
 
             // get the command line arguments
             String opt = "1";
@@ -57,17 +57,17 @@ public class MyJavaCrasherConsole {
             }
         } catch (Exception e) {
             // let the BugSplat library report the exception
-            BugSplat.HandleException(e);
+            BugSplat.handleException(e);
         } catch (Throwable t) {
             // construct an exception and let the BugSplat library report it
-            BugSplat.HandleException(new Exception(t));
+            BugSplat.handleException(new Exception(t));
         }
 
         // do not terminate the app, otherwise the report will not be posted
         // System.exit(1);
 
         // tell the BugSplat handler to terminate the app (optional)
-        BugSplat.SetTerminateApplication(true);
+        BugSplat.setTerminateApplication(true);
     }
 
     //
