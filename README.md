@@ -1,20 +1,84 @@
-# bugsplat-java
-BugSplat integration for Java
+[![BugSplat Banner Image](https://user-images.githubusercontent.com/20464226/149019306-3186103c-5315-4dad-a499-4fd1df408475.png)](https://bugsplat.com)
 
-### Setup files for BugSplat Java
------------------------------
+# BugSplat
+### **Crash and error reporting built for busy developers.**
 
-Sun Java 2 Standard Edition (aka J2SE) SDK, version 1.4.2_09
-http://java.sun.com/j2se/1.4.2/download.html
+[![Follow @bugsplatco on Twitter](https://img.shields.io/twitter/follow/bugsplatco?label=Follow%20BugSplat&style=social)](https://twitter.com/bugsplatco)
+[![Join BugSplat on Discord](https://img.shields.io/discord/664965194799251487?label=Join%20Discord&logo=Discord&style=social)](https://discord.gg/bugsplat)
 
-Apache SOAP 2.3.1:
-http://apache.seekmeup.com/ws/soap/version-2.3.1/soap-bin-2.3.1.zip
+## 👋 Introduction
 
-JavaBeans Activation Framework 1.0.2
-http://java.sun.com/products/javabeans/glasgow/jaf.html
+BugSplat's Java SDK allows you to capture and track exceptions on all JVM platforms. Before continuing with the tutorial please make sure you have completed the following checklist:
 
-Java Mail 1.3.3
-http://java.sun.com/products/javamail/
+- [Register](https://app.bugsplat.com/v2/sign-up) as a new BugSplat user.
+- [Log in](https://app.bugsplat.com/auth0/login) using your email address.
 
-CLASSPATH
-.;C:\Java\lib;C:\Java\soap-2_3_1\lib\soap.jar;C:\Java\javamail-1.3.3_01\lib\mailapi.jar;C:\Java\jaf-1.0.2\lib\activation.jar;
+## 🏗 Installation
+
+Install `com.bugsplat` from [Maven Central](https://search.maven.org/artifact/com.bugsplat/bugsplat-java):
+
+Maven
+```xml
+<dependency>
+    <groupId>com.bugsplat</groupId>
+    <artifactId>bugsplat-java</artifactId>
+    <version>0.0.0</version>
+</dependency>
+```
+
+Gradle
+```kotlin
+implementation("com.bugsplat:bugsplat-java:0.0.0")
+```
+
+## ⚙️ Configuration
+
+After you've installed the SDK from Maven, add an import statement for `com.bugsplat.BugSplat`:
+
+```java
+import com.bugsplat.BugSplat;
+```
+
+Call `BugSplat.init` providing it your `database`, `application`, and `version`. It's best to do this at the entry point of your application. Several defaults can be provided to BugSplat. You can provide default values for things such as `description`, `email`, `key`, `notes`, `user` and additional file attachments.
+
+```java
+BugSplat.init("Fred", "MyJavaCrasherConsole", "1.0");
+BugSplat.setDescription("Please enter a description");
+BugSplat.setEmail("fred@bugsplat.com");
+BugSplat.setNotes("bobby testing notes");
+BugSplat.setKey("en-US");
+BugSplat.setUser("Fred");
+BugSplat.addAdditionalFile(new File("file.txt").getAbsolutePath());
+```
+
+For servers, console applications, or applications where you don't want to show the crash dialog, call `BugSplat.setQuietMode` to prevent the BugSplat dialog from appearing.
+
+```java
+BugSplat.setQuietMode(true);
+```
+
+Wrap your application in a try/catch block and call `BugSplat.handleException` in the catch block. This will post the exception to BugSplat.
+
+```java
+try {
+    throw new Error("BugSplat rocks!");
+} catch (Exception ex) {
+    Bugsplat.handleException(ex);
+}
+```
+
+## ✅ Verification
+
+Once you've generated an error, navigate to the BugSplat [Dashboard](https://app.bugsplat.com/v2/dashboard) and ensure you have to correct database selected in the dropdown menu. You should see a new crash report under the **Recent Crashes** section:
+
+TODO BG BugSplat Dashboard Page
+
+Click the link in the **ID** column to see details about the crash:
+
+TODO BG BugSplat Crash Page
+
+That’s it! Your application is now configured to post crash reports to BugSplat.
+
+## 👷 Support
+
+If you have any additional questions, please email or [support](mailto:support@bugsplat.com) team, join us on [Discord](https://discord.gg/K4KjjRV5ve), or reach out via the chat in our web application.
