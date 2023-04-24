@@ -63,7 +63,7 @@ Wrap your application in a try/catch block and call `BugSplat.handleException` i
 
 ```java
 try {
-    throw new Error("BugSplat rocks!");
+    throw new Exception("BugSplat rocks!");
 } catch (Exception ex) {
     Bugsplat.handleException(ex);
 }
@@ -75,15 +75,15 @@ This repo includes sample projects that demonstrate how to integrate `bugsplat-j
 
 ## ✅ Verification
 
-Once you've generated an error, navigate to the BugSplat [Dashboard](https://app.bugsplat.com/v2/dashboard) and ensure you have to correct database selected in the dropdown menu. You should see a new error report under the **Recent Crashes** section:
+Once you've generated an exception, navigate to the BugSplat [Dashboard](https://app.bugsplat.com/v2/dashboard) and ensure you have to correct database selected in the dropdown menu. You should see a new report under the **Recent Crashes** section:
 
 <img width="1728" alt="BugSplat Dashboard Page" src="https://user-images.githubusercontent.com/2646053/234051911-2bed816e-ffff-424e-8dcd-d81f678cfbfa.png">
 
-Click the link in the **ID** column to see details about the error:
+Click the link in the **ID** column to see details about the report:
 
 <img width="1727" alt="BugSplat Crash Page" src="https://user-images.githubusercontent.com/2646053/234052953-465c53f2-e4c2-4190-8d5b-d6d6ec556e97.png">
 
-That’s it! Your application is now configured to post error reports to BugSplat.
+That’s it! Your application is now configured to post reports to BugSplat.
 
 ## 👷 Support
 
