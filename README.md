@@ -15,9 +15,11 @@ BugSplat's Java SDK allows you to capture and track exceptions on all JVM platfo
 
 ## 🏗 Installation
 
-Install `com.bugsplat` from [Maven Central](https://search.maven.org/artifact/com.bugsplat/bugsplat-java):
+[![Maven Badge](https://maven-badges.herokuapp.com/maven-central/com.bugsplat/bugsplat-java/badge.svg?style=flat)](https://search.maven.org/artifact/com.bugsplat/bugsplat-java)
 
-Maven
+Install `com.bugsplat` from [Maven Central](https://search.maven.org/artifact/com.bugsplat/bugsplat-java).
+
+**Maven**
 ```xml
 <dependency>
     <groupId>com.bugsplat</groupId>
@@ -26,7 +28,7 @@ Maven
 </dependency>
 ```
 
-Gradle
+**Gradle**
 ```kotlin
 implementation("com.bugsplat:bugsplat-java:0.0.0")
 ```
@@ -51,7 +53,7 @@ BugSplat.setUser("Fred");
 BugSplat.addAdditionalFile(new File("file.txt").getAbsolutePath());
 ```
 
-For servers, console applications, or applications where you don't want to show the crash dialog, call `BugSplat.setQuietMode` to prevent the BugSplat dialog from appearing.
+For servers, console applications, or applications where you don't want to show the report dialog, call `BugSplat.setQuietMode` to prevent the BugSplat dialog from appearing.
 
 ```java
 BugSplat.setQuietMode(true);
@@ -69,15 +71,15 @@ try {
 
 ## ✅ Verification
 
-Once you've generated an error, navigate to the BugSplat [Dashboard](https://app.bugsplat.com/v2/dashboard) and ensure you have to correct database selected in the dropdown menu. You should see a new crash report under the **Recent Crashes** section:
+Once you've generated an error, navigate to the BugSplat [Dashboard](https://app.bugsplat.com/v2/dashboard) and ensure you have to correct database selected in the dropdown menu. You should see a new error report under the **Recent Crashes** section:
 
-TODO BG BugSplat Dashboard Page
+<img width="1728" alt="BugSplat Dashboard Page" src="https://user-images.githubusercontent.com/2646053/234051911-2bed816e-ffff-424e-8dcd-d81f678cfbfa.png">
 
-Click the link in the **ID** column to see details about the crash:
+Click the link in the **ID** column to see details about the error:
 
-TODO BG BugSplat Crash Page
+<img width="1727" alt="BugSplat Crash Page" src="https://user-images.githubusercontent.com/2646053/234052953-465c53f2-e4c2-4190-8d5b-d6d6ec556e97.png">
 
-That’s it! Your application is now configured to post crash reports to BugSplat.
+That’s it! Your application is now configured to post error reports to BugSplat.
 
 ## 👷 Support
 
