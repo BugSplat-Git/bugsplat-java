@@ -6,5 +6,9 @@ build
 
 # Windows build artifacts
 bin
+
 # Signing
 *.gpg
+
+# macOS
+.DS_Store
