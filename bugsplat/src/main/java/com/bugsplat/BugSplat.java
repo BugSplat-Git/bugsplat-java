@@ -213,6 +213,31 @@ public class BugSplat implements Runnable {
     }
 
     /**
+     * Post user feedback with a title only.
+     */
+    public static void postFeedback(String title) {
+        postFeedback(title, "");
+    }
+
+    /**
+     * Post user feedback with a title and description.
+     */
+    public static void postFeedback(String title, String description) {
+        try {
+            BugSplatClient client = new BugSplatClient(m_strDatabase, m_strAppName, m_strVersion, httpClientFactory);
+            BugSplatPostOptions options = new BugSplatPostOptions();
+            options.description = m_strUserDescription;
+            options.email = m_strUserEmail;
+            options.key = m_strKey;
+            options.notes = m_strNotes;
+            options.user = m_strUserName;
+            client.PostFeedback(title, description, options);
+        } catch (Exception e) {
+            System.out.println("Exception in postFeedback: " + e);
+        }
+    }
+
+    /**
      * Handle a caught exception with BugSplat. The crash report package will be
      * sent to the BugSplat website.
      */
