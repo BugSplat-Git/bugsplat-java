@@ -22,8 +22,16 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 public class BugSplatClient {
 
@@ -34,6 +42,7 @@ public class BugSplatClient {
     private final String version;
 
     final static int crashTypeId = 4;
+    final static int FEEDBACK_CRASH_TYPE_ID = 36;
 
     // TODO BG http client factory
     public BugSplatClient(
@@ -52,6 +61,13 @@ public class BugSplatClient {
     // post the zip file to the BugSplat server
     //
     public BugSplatPostResult PostDumpFile(File crashZip, BugSplatPostOptions options) throws Exception {
+        return PostDumpFileWithCrashType(crashZip, options, crashTypeId);
+    }
+
+    //
+    // post the zip file to the BugSplat server with a specific crash type
+    //
+    public BugSplatPostResult PostDumpFileWithCrashType(File crashZip, BugSplatPostOptions options, int crashTypeId) throws Exception {
         CloseableHttpClient httpClient = this.httpClientFactory.create();
 
         System.out.println("Getting pre-signed url...");
@@ -69,7 +85,8 @@ public class BugSplatClient {
                 httpClient,
                 crashUploadUrl,
                 md5,
-                options
+                options,
+                crashTypeId
         );
 
         System.out.println("Upload complete!");
@@ -79,13 +96,68 @@ public class BugSplatClient {
         return result;
     }
 
+    //
+    // post user feedback to the BugSplat server (without attachments)
+    //
+    public BugSplatPostResult PostFeedback(String title, String description, BugSplatPostOptions options) throws Exception {
+        return PostFeedback(title, description, options, Collections.emptyList());
+    }
+
+    //
+    // post user feedback to the BugSplat server (with file attachments)
+    //
+    public BugSplatPostResult PostFeedback(String title, String description, BugSplatPostOptions options, List<File> attachments) throws Exception {
+        // Create feedback.json
+        File feedbackFile = File.createTempFile("feedback", ".json");
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(feedbackFile))) {
+            // Simple JSON escaping
+            String escapedTitle = title.replace("\\", "\\\\").replace("\"", "\\\"").replace("\n", "\\n").replace("\r", "\\r");
+            String escapedDesc = description.replace("\\", "\\\\").replace("\"", "\\\"").replace("\n", "\\n").replace("\r", "\\r");
+            writer.write("{\"title\":\"" + escapedTitle + "\",\"description\":\"" + escapedDesc + "\"}");
+        }
+
+        // Create zip containing feedback.json and any attachments
+        File feedbackZip = File.createTempFile("feedback", ".zip");
+        try (ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(feedbackZip))) {
+            byte[] buffer = new byte[1024];
+
+            // Add feedback.json
+            zos.putNextEntry(new ZipEntry("feedback.json"));
+            try (FileInputStream fis = new FileInputStream(feedbackFile)) {
+                int len;
+                while ((len = fis.read(buffer)) > 0) {
+                    zos.write(buffer, 0, len);
+                }
+            }
+            zos.closeEntry();
+
+            // Add attachment files
+            for (File attachment : attachments) {
+                String entryName = attachment.getName();
+                zos.putNextEntry(new ZipEntry(entryName));
+                try (FileInputStream fis = new FileInputStream(attachment)) {
+                    int len;
+                    while ((len = fis.read(buffer)) > 0) {
+                        zos.write(buffer, 0, len);
+                    }
+                }
+                zos.closeEntry();
+            }
+        }
+
+        feedbackFile.delete();
+
+        // Use the 3-step flow with crashTypeId=36
+        return PostDumpFileWithCrashType(feedbackZip, options, FEEDBACK_CRASH_TYPE_ID);
+    }
+
     private static String getETagFromResponseUnquoted(HttpResponse crashUploadResponse) {
         String eTag = crashUploadResponse.getHeaders("ETag")[0].getValue();
         String eTagUnquoted = eTag.replace("\"", "");
         return eTagUnquoted;
     }
 
-    private BugSplatPostResult commitS3CrashUpload(HttpClient httpClient, String crashUploadUrl, String md5, BugSplatPostOptions options) throws IOException {
+    private BugSplatPostResult commitS3CrashUpload(HttpClient httpClient, String crashUploadUrl, String md5, BugSplatPostOptions options, int crashTypeId) throws IOException {
         String commitS3CrashUrl = String.format("https://%s.bugsplat.com/api/commitS3CrashUpload", this.database);
         HttpPost commitCrashRequest = new HttpPost(commitS3CrashUrl);
         MultipartEntityBuilder builder = MultipartEntityBuilder.create()
