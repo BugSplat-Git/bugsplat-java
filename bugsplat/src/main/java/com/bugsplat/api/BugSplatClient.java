@@ -28,6 +28,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -95,9 +97,16 @@ public class BugSplatClient {
     }
 
     //
-    // post user feedback to the BugSplat server
+    // post user feedback to the BugSplat server (without attachments)
     //
     public BugSplatPostResult PostFeedback(String title, String description, BugSplatPostOptions options) throws Exception {
+        return PostFeedback(title, description, options, Collections.emptyList());
+    }
+
+    //
+    // post user feedback to the BugSplat server (with file attachments)
+    //
+    public BugSplatPostResult PostFeedback(String title, String description, BugSplatPostOptions options, List<File> attachments) throws Exception {
         // Create feedback.json
         File feedbackFile = File.createTempFile("feedback", ".json");
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(feedbackFile))) {
@@ -107,11 +116,13 @@ public class BugSplatClient {
             writer.write("{\"title\":\"" + escapedTitle + "\",\"description\":\"" + escapedDesc + "\"}");
         }
 
-        // Create zip containing feedback.json
+        // Create zip containing feedback.json and any attachments
         File feedbackZip = File.createTempFile("feedback", ".zip");
         try (ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(feedbackZip))) {
-            zos.putNextEntry(new ZipEntry("feedback.json"));
             byte[] buffer = new byte[1024];
+
+            // Add feedback.json
+            zos.putNextEntry(new ZipEntry("feedback.json"));
             try (FileInputStream fis = new FileInputStream(feedbackFile)) {
                 int len;
                 while ((len = fis.read(buffer)) > 0) {
@@ -119,6 +130,19 @@ public class BugSplatClient {
                 }
             }
             zos.closeEntry();
+
+            // Add attachment files
+            for (File attachment : attachments) {
+                String entryName = attachment.getName();
+                zos.putNextEntry(new ZipEntry(entryName));
+                try (FileInputStream fis = new FileInputStream(attachment)) {
+                    int len;
+                    while ((len = fis.read(buffer)) > 0) {
+                        zos.write(buffer, 0, len);
+                    }
+                }
+                zos.closeEntry();
+            }
         }
 
         feedbackFile.delete();

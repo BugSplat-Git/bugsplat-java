@@ -216,13 +216,20 @@ public class BugSplat implements Runnable {
      * Post user feedback with a title only.
      */
     public static void postFeedback(String title) {
-        postFeedback(title, "");
+        postFeedback(title, "", Collections.emptyList());
     }
 
     /**
      * Post user feedback with a title and description.
      */
     public static void postFeedback(String title, String description) {
+        postFeedback(title, description, Collections.emptyList());
+    }
+
+    /**
+     * Post user feedback with a title, description, and file attachments.
+     */
+    public static void postFeedback(String title, String description, List<File> attachments) {
         try {
             BugSplatClient client = new BugSplatClient(m_strDatabase, m_strAppName, m_strVersion, httpClientFactory);
             BugSplatPostOptions options = new BugSplatPostOptions();
@@ -231,7 +238,7 @@ public class BugSplat implements Runnable {
             options.key = m_strKey;
             options.notes = m_strNotes;
             options.user = m_strUserName;
-            client.PostFeedback(title, description, options);
+            client.PostFeedback(title, description, options, attachments);
         } catch (Exception e) {
             System.out.println("Exception in postFeedback: " + e);
         }
